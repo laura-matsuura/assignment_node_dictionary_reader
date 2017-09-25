@@ -5,14 +5,18 @@ function start () {
     process.stdin.resume();
     process.stdin.setEncoding('utf8');
 
+    let directorySize; 
+
     // Inline function to handle
     // message output
     var showMessage = (err) => {
         console.log('Welcome to the Node Dictionary!');
         console.log('======================================');
         console.log('Enter Q to Quit!');
-        const readFiles = fileLister.listFiles();
-        readFiles.forEach(function(file,index){
+        console.log('Select a Dictionary to Load:')
+        const readNumberofFiles = fileLister.listFiles();
+        directorySize = readNumberofFiles.length; 
+        readNumberofFiles.forEach(function(file,index){
             console.log(`${index+1}. ${file}`); 
         });
     
@@ -29,31 +33,48 @@ function start () {
     var onData = (data) => {
         data = data.trim();
 
+        //If user inputs 'q' 
+        //Quit application 
         if (data.toLowerCase() === 'q') {
             console.log('Goodbye!')
             process.exit(); 
         }
 
-        // If user input "next"
-        // let's go to the next
-        // state
-        if (data === 'next') {
-            process.stdin.pause();
-            process.stdin.removeListener('data', onData);
-            two();
+        if (Number.isInteger(Number(data))) {
+            const index = Number(data) - 1; 
+            if (index > directorySize) {
+                console.log('Files Does Not Exist')
+            } else {
+                const fileName = fileLister.getFileName(index); 
+                const fileContents = fileLister.readFile(fileName);
+                console.log(`Successfully Loaded: ${fileName}`);
+            }
 
-            // ----------------------------------------
-            // Go to next view here
-            // ----------------------------------------
 
-        } else {
-
-            // All other input is invalid
-            showMessage(`Invalid: ${ data }`);
         }
+
+        // // If user input "next"
+        // // let's go to the next
+        // // state
+        // if (data === 'next') {
+        //     process.stdin.pause();
+        //     process.stdin.removeListener('data', onData);
+        //     two();
+
+        //     // ----------------------------------------
+        //     // Go to next view here
+        //     // ----------------------------------------
+
+        // } else {
+
+        //     // All other input is invalid
+        //     showMessage(`Invalid: ${ data }`);
+        // }
     };
 
-    // Set the listener
+    // Set the listenerp
     process.stdin.on('data', onData);
 
 }
+
+
